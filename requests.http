@@ -1,0 +1,72 @@
+# Manual API tests for the IntelliJ HTTP Client.
+# Start RestaurantApplication first, then run the requests from top to bottom
+# (click the green arrow next to each request). Ids assume a freshly started application.
+
+### 1. Add a table
+POST http://localhost:8080/api/tables
+Content-Type: application/json
+
+{ "number": 5, "seats": 4 }
+
+### 2. Add menu items
+POST http://localhost:8080/api/menu
+Content-Type: application/json
+
+{ "name": "Tripe Soup", "category": "APPETIZER", "price": 22.50, "available": true }
+
+###
+POST http://localhost:8080/api/menu
+Content-Type: application/json
+
+{ "name": "Papanasi", "category": "DESSERT", "price": 25.00, "available": true }
+
+### 3. The whole menu / filtered by category
+GET http://localhost:8080/api/menu
+
+###
+GET http://localhost:8080/api/menu?category=DESSERT
+
+### 4. Update a menu item
+PUT http://localhost:8080/api/menu/1
+Content-Type: application/json
+
+{ "name": "Tripe Soup", "category": "APPETIZER", "price": 24.00, "available": true }
+
+### 5. Reservation -> 201
+POST http://localhost:8080/api/reservations
+Content-Type: application/json
+
+{ "customerName": "Andrei Popescu", "phone": "0722123456", "tableId": 1, "dateTime": "2030-12-20T19:00:00", "partySize": 4 }
+
+### 6. Overlapping reservation on the same table -> 409
+POST http://localhost:8080/api/reservations
+Content-Type: application/json
+
+{ "customerName": "Maria Ionescu", "phone": "0733111222", "tableId": 1, "dateTime": "2030-12-20T20:00:00", "partySize": 2 }
+
+### 7. Order: 2 x Tripe Soup + 1 x Papanasi -> 201, total computed by the server
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+
+{ "tableId": 1, "items": [ { "menuItemId": 1, "quantity": 2 }, { "menuItemId": 2, "quantity": 1 } ] }
+
+### 8. Order lifecycle: NEW -> IN_PREPARATION
+PUT http://localhost:8080/api/orders/1/status
+Content-Type: application/json
+
+{ "status": "IN_PREPARATION" }
+
+### 9. Forbidden transition (back to NEW) -> 409
+PUT http://localhost:8080/api/orders/1/status
+Content-Type: application/json
+
+{ "status": "NEW" }
+
+### 10. Orders by status
+GET http://localhost:8080/api/orders?status=IN_PREPARATION
+
+### 11. Invalid data -> 400 with one message per field
+POST http://localhost:8080/api/menu
+Content-Type: application/json
+
+{ "name": "", "price": -1 }

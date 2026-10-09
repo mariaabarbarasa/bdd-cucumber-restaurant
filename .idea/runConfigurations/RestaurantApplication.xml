@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="RestaurantApplication" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="ro.tss.restaurant.RestaurantApplication" />
+    <module name="bdd-cucumber-restaurant" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

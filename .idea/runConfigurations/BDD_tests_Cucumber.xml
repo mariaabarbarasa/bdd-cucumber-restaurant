@@ -1,0 +1,11 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="BDD tests (Cucumber)" type="JUnit" factoryName="JUnit">
+    <module name="bdd-cucumber-restaurant" />
+    <option name="PACKAGE_NAME" value="ro.tss.restaurant.bdd" />
+    <option name="MAIN_CLASS_NAME" value="ro.tss.restaurant.bdd.RunCucumberTest" />
+    <option name="TEST_OBJECT" value="class" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

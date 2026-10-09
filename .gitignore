@@ -1,0 +1,10 @@
+# Build output
+target/
+
+# IntelliJ IDEA: keep only the shared run configurations
+.idea/*
+!.idea/runConfigurations/
+*.iml
+
+# macOS
+.DS_Store
