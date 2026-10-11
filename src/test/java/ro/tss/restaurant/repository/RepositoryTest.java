@@ -9,19 +9,27 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
 import ro.tss.restaurant.model.Category;
 import ro.tss.restaurant.model.CustomerOrder;
 import ro.tss.restaurant.model.MenuItem;
 import ro.tss.restaurant.model.Reservation;
 import ro.tss.restaurant.model.RestaurantTable;
+import ro.tss.restaurant.support.PostgresTestConfiguration;
 
 /**
- * Persistence layer tests (in-memory H2): queries derived from method names
- * and the database constraints.
+ * Persistence layer tests on PostgreSQL (Testcontainers, schema created by Flyway):
+ * queries derived from method names and the database constraints.
+ * Every test runs in a transaction that is rolled back at the end.
  */
 @DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
+@Import(PostgresTestConfiguration.class)
 class RepositoryTest {
 
     @Autowired private MenuItemRepository menu;
