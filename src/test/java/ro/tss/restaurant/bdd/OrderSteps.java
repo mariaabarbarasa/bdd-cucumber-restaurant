@@ -91,6 +91,21 @@ public class OrderSteps {
                 HttpMethod.PUT, new HttpEntity<>(new StatusRequest(OrderStatus.valueOf(status))), String.class));
     }
 
+    @When("I request the current order")
+    public void requestCurrentOrder() {
+        context.setLastResponse(rest.getForEntity(ORDERS_URL + "/" + context.getCurrentOrderId(), String.class));
+    }
+
+    @When("I request order {long}")
+    public void requestOrder(long id) {
+        context.setLastResponse(rest.getForEntity(ORDERS_URL + "/" + id, String.class));
+    }
+
+    @When("I request all orders")
+    public void requestAllOrders() {
+        context.setLastResponse(rest.getForEntity(ORDERS_URL, String.class));
+    }
+
     @When("I request the orders with status {string}")
     public void requestOrdersByStatus(String status) {
         context.setLastResponse(rest.getForEntity(ORDERS_URL + "?status={s}", String.class, status));

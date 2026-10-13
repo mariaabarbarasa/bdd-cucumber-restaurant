@@ -58,6 +58,28 @@ public class TableAndReservationSteps {
         context.setLastResponse(rest.postForEntity("/api/tables", new TableRequest(number, seats), String.class));
     }
 
+    @When("I update table {int} to number {int} with {int} seats")
+    public void updateTable(int currentNumber, int newNumber, int seats) {
+        RestaurantTable table = table(currentNumber);
+        context.setLastResponse(rest.exchange("/api/tables/" + table.getId(), HttpMethod.PUT,
+                new HttpEntity<>(new TableRequest(newNumber, seats)), String.class));
+    }
+
+    @When("I request all tables")
+    public void requestAllTables() {
+        context.setLastResponse(rest.getForEntity("/api/tables", String.class));
+    }
+
+    @When("I request table {int}")
+    public void requestTable(int number) {
+        context.setLastResponse(rest.getForEntity("/api/tables/" + table(number).getId(), String.class));
+    }
+
+    @When("I request table with id {long}")
+    public void requestTableById(long id) {
+        context.setLastResponse(rest.getForEntity("/api/tables/" + id, String.class));
+    }
+
     @When("I delete table {int}")
     public void deleteTable(int number) {
         context.setLastResponse(rest.exchange("/api/tables/" + table(number).getId(), HttpMethod.DELETE,
@@ -80,10 +102,29 @@ public class TableAndReservationSteps {
                 new HttpEntity<>(request), String.class));
     }
 
+    @When("I move the reservation of {string} to table {int}")
+    public void moveReservationToTable(String customer, int tableNumber) {
+        Reservation r = reservationOf(customer);
+        ReservationRequest request = new ReservationRequest(r.getCustomerName(), r.getPhone(),
+                table(tableNumber).getId(), r.getDateTime(), r.getPartySize());
+        context.setLastResponse(rest.exchange("/api/reservations/" + r.getId(), HttpMethod.PUT,
+                new HttpEntity<>(request), String.class));
+    }
+
     @When("I cancel the reservation of {string}")
     public void cancelReservation(String customer) {
         context.setLastResponse(rest.exchange("/api/reservations/" + reservationOf(customer).getId(),
                 HttpMethod.DELETE, null, String.class));
+    }
+
+    @When("I request all reservations")
+    public void requestAllReservations() {
+        context.setLastResponse(rest.getForEntity("/api/reservations", String.class));
+    }
+
+    @When("I request the reservation of {string}")
+    public void requestReservation(String customer) {
+        context.setLastResponse(rest.getForEntity("/api/reservations/" + reservationOf(customer).getId(), String.class));
     }
 
     // ---------- Then ----------
@@ -91,6 +132,11 @@ public class TableAndReservationSteps {
     @Then("the restaurant has {int} tables")
     public void restaurantHasTables(int count) {
         assertThat(tables.count()).isEqualTo(count);
+    }
+
+    @Then("table {int} has {int} seats")
+    public void tableHasSeats(int tableNumber, int seats) {
+        assertThat(table(tableNumber).getSeats()).isEqualTo(seats);
     }
 
     @Then("table {int} has {int} reservations")
@@ -104,6 +150,11 @@ public class TableAndReservationSteps {
     @Then("the reservation of {string} is on {string}")
     public void reservationIsOn(String customer, String dateTime) {
         assertThat(reservationOf(customer).getDateTime()).isEqualTo(LocalDateTime.parse(dateTime));
+    }
+
+    @Then("the reservation of {string} is at table {int}")
+    public void reservationIsAtTable(String customer, int tableNumber) {
+        assertThat(reservationOf(customer).getTable().getNumber()).isEqualTo(tableNumber);
     }
 
     private RestaurantTable table(int number) {

@@ -38,6 +38,19 @@ Feature: Customer orders
     Then the response status is 400
     And the error for field "items" is "Order must contain at least one menu item"
 
+  Scenario Outline: An order item quantity must be positive
+    When table 5 orders:
+      | item       | quantity |
+      | Tripe Soup | <quantity> |
+    Then the response status is 400
+    And the error for field "items[0].quantity" is "Quantity must be at least 1"
+    And there are no orders
+
+    Examples:
+      | quantity |
+      | 0        |
+      | -1       |
+
   Scenario: A price increase does not change an order already placed
     Given table 5 has ordered 1 x "Cabbage Rolls with Polenta"
     When I change the price of "Cabbage Rolls with Polenta" to 45.00
@@ -69,6 +82,30 @@ Feature: Customer orders
     Then the response status is 200
     And the list contains 1 element
 
+  Scenario: Viewing all orders
+    Given table 5 has an order with status "NEW"
+    And table 5 has an order with status "PAID"
+    When I request all orders
+    Then the response status is 200
+    And the list contains 2 elements
+
+  Scenario: Filtering orders when none have the requested status
+    When I request the orders with status "SERVED"
+    Then the response status is 200
+    And the list contains 0 elements
+
+  Scenario: Viewing a specific order
+    Given table 5 has ordered 2 x "Tripe Soup"
+    When I request the current order
+    Then the response status is 200
+    And the response field "status" is "NEW"
+    And the order total is 45.00 lei
+
+  Scenario: Viewing an order that does not exist
+    When I request order 999
+    Then the response status is 404
+    And the error message contains "was not found"
+
   Scenario: A served order can no longer be deleted
     Given table 5 has an order with status "SERVED"
     When I delete the order
@@ -77,6 +114,12 @@ Feature: Customer orders
 
   Scenario: Deleting a new order
     Given table 5 has an order with status "NEW"
+    When I delete the order
+    Then the response status is 204
+    And there are no orders
+
+  Scenario: Deleting a cancelled order
+    Given table 5 has an order with status "CANCELLED"
     When I delete the order
     Then the response status is 204
     And there are no orders

@@ -26,6 +26,13 @@ Feature: Restaurant menu management
     And the error message contains "A menu item named Papanasi already exists"
     And the menu contains 4 items
 
+  @create
+  Scenario: Menu item names are unique regardless of letter case
+    When I add the menu item "papanasi" in category "DESSERT" with price 30.00
+    Then the response status is 409
+    And the error message contains "A menu item named papanasi already exists"
+    And the menu contains 4 items
+
   @read
   Scenario: Viewing the whole menu
     When I request the menu
@@ -33,10 +40,22 @@ Feature: Restaurant menu management
     And the list contains 4 elements
 
   @read
+  Scenario: Viewing a menu item by name
+    When I request the menu item named "Papanasi"
+    Then the response status is 200
+    And the response field "name" is "Papanasi"
+
+  @read
   Scenario: Filtering the menu by category
     When I request the items in category "DESSERT"
     Then the response status is 200
     And the list contains 1 element
+
+  @read
+  Scenario: Rejecting an unsupported menu category filter
+    When I request the items in category "SIDES"
+    Then the response status is 400
+    And the error message contains "SIDES"
 
   @read
   Scenario: Viewing a menu item that does not exist
@@ -49,6 +68,20 @@ Feature: Restaurant menu management
     When I change the price of "Papanasi" to 27.50
     Then the response status is 200
     And "Papanasi" costs 27.50 lei
+
+  @update
+  Scenario: Renaming a menu item
+    When I rename the menu item "Papanasi" to "Papanasi de casa"
+    Then the response status is 200
+    And the response field "name" is "Papanasi de casa"
+    And the menu contains 4 items
+
+  @update
+  Scenario: A menu item cannot be renamed to an existing name
+    When I rename the menu item "Papanasi" to "Tripe Soup"
+    Then the response status is 409
+    And the error message contains "A menu item named Tripe Soup already exists"
+    And the menu contains 4 items
 
   @update
   Scenario: Temporarily removing an item from the offer

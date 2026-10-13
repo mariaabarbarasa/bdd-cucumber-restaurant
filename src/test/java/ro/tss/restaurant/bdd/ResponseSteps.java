@@ -31,6 +31,11 @@ public class ResponseSteps {
         assertThat(body().get("name").asText()).isEqualTo(name);
     }
 
+    @Then("the response field {string} is {string}")
+    public void responseFieldIs(String field, String value) throws Exception {
+        assertThat(body().path(field).asText()).isEqualTo(value);
+    }
+
     @Then("the list contains {int} element(s)")
     public void listContains(int count) throws Exception {
         assertThat(body().isArray()).isTrue();

@@ -71,6 +71,18 @@ public class MenuSteps {
         context.setLastResponse(rest.getForEntity(MENU_URL + "/" + id, String.class));
     }
 
+    @When("I request the menu item named {string}")
+    public void requestMenuItemByName(String name) {
+        context.setLastResponse(rest.getForEntity(MENU_URL + "/" + find(name).getId(), String.class));
+    }
+
+    @When("I rename the menu item {string} to {string}")
+    public void renameMenuItem(String currentName, String newName) {
+        MenuItem item = find(currentName);
+        update(item, new MenuItemRequest(newName, item.getDescription(), item.getCategory(),
+                item.getPrice(), item.isAvailable()));
+    }
+
     @When("I change the price of {string} to {bigdecimal}")
     public void changePrice(String name, BigDecimal price) {
         MenuItem item = find(name);
